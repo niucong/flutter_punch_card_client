@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:punchcardclient/common/funs.dart';
 
 class DioManger {
   static DioManger _instance;
@@ -40,8 +39,9 @@ class DioManger {
     Response response;
     try {
       print(url);
+      dio.options.headers[HttpHeaders.contentTypeHeader] =
+          "application/x-www-form-urlencoded";
       if (headers != null) {
-        dio.options.headers[HttpHeaders.contentTypeHeader] = "application/x-www-form-urlencoded";
         ///显示指定Map的限定类型 动态添加headers
         dio.options.headers.addAll(new Map<String, String>.from(headers));
       }

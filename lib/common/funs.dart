@@ -90,17 +90,3 @@ void showLoading(context, [String text]) {
         );
       });
 }
-
-Future<String> getSP(var key) async {
-  var url;
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  url = prefs.getString(key);
-  return url;
-}
-
-saveSP(var key, var value) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString(
-      key,
-      value);
-}

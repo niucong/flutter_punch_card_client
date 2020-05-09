@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:punchcardclient/common/funs.dart';
+import 'package:punchcardclient/common/git_api.dart';
+import 'package:punchcardclient/common/global.dart';
 
 class HomeRoute extends StatefulWidget {
   @override
@@ -20,7 +22,7 @@ class _HomeRouteState extends State<HomeRoute> {
               icon: new Icon(Icons.exit_to_app),
               tooltip: '退出',
               onPressed: () {
-                saveSP("url", "");
+                Global.saveSP("url", "");
                 Navigator.of(context).pop();
                 Navigator.pushNamed(context, "login");
               }),
@@ -43,7 +45,13 @@ class _HomeRouteState extends State<HomeRoute> {
               "点击打卡",
               textScaleFactor: 1.3,
             ),
-            onPressed: () {
+            onPressed: () async {
+              await Git(context).getPlanList(
+                {
+                  'offset': 0,
+                  'pageSize': '20',
+                },
+              );
               showToast("点击打卡");
             },
           ),
@@ -94,7 +102,7 @@ class _HomeRouteState extends State<HomeRoute> {
               textScaleFactor: 1.3,
             ),
             onPressed: () {
-              showToast("校历");
+              Navigator.pushNamed(context, "calendar_list");
             },
           ),
           RaisedButton(
@@ -104,7 +112,7 @@ class _HomeRouteState extends State<HomeRoute> {
               textScaleFactor: 1.3,
             ),
             onPressed: () {
-              showToast("查看考勤");
+              Navigator.pushNamed(context, "sign_list");
             },
           ),
           RaisedButton(
@@ -114,7 +122,8 @@ class _HomeRouteState extends State<HomeRoute> {
               textScaleFactor: 1.3,
             ),
             onPressed: () {
-              showToast("查看假条");
+//              showToast("查看假条");
+              Navigator.pushNamed(context, "vacate_list");
             },
           ),
         ],

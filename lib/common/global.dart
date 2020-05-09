@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'git_api.dart';
+
 class Global {
   static SharedPreferences _prefs;
 
@@ -30,11 +32,27 @@ class Global {
 //      ..maxAge = 3600
 //      ..maxCount = 100;
 //
-//    //初始化网络请求相关配置
-//    Git.init();
+    //初始化网络请求相关配置
+    Git.init();
   }
 
 // 持久化Profile信息
 //  static saveProfile() =>
 //      _prefs.setString("profile", jsonEncode(profile.toJson()));
+
+  static Future<String> getSP(var key) async {
+    return _prefs.getString(key);
+  }
+
+  static saveSP(var key, var value) async {
+    _prefs.setString(key, value);
+  }
+
+  static Future<int> getSPInt(var key) async {
+    return _prefs.getInt(key);
+  }
+
+  static saveSPInt(var key, var value) async {
+    _prefs.setInt(key, value);
+  }
 }

@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:punchcardclient/common/dio_manager.dart';
 import 'package:punchcardclient/common/funs.dart';
+import 'package:punchcardclient/common/git_api.dart';
+import 'package:punchcardclient/common/global.dart';
 import 'package:punchcardclient/entity/login_entity.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,19 +15,21 @@ class LoginPage extends StatefulWidget {
 
 class _LoginState extends State<LoginPage> {
   TextEditingController _seversIPController = new TextEditingController();
-  TextEditingController _seversPortController = new TextEditingController();
+  TextEditingController _seversPortController =
+      new TextEditingController.fromValue(TextEditingValue(
+    text: '8080',
+  ));
   TextEditingController _unameController = new TextEditingController();
   TextEditingController _pwdController = new TextEditingController();
   bool pwdShow = false;
-  GlobalKey _formKey = new GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    if(getSP("url").toString().isNotEmpty){
-      Navigator.of(context).pop();
-      Navigator.pushNamed(context, "home");
-    }
+//    if(getSP("url").toString().isNotEmpty){
+//      Navigator.of(context).pop();
+//      Navigator.pushNamed(context, "home");
+//    }
   }
 
   @override
@@ -128,45 +129,51 @@ class _LoginState extends State<LoginPage> {
     );
   }
 
-  void _onLogin() {
+  void _onLogin() async {
     showLoading(context);
     var params = {
       'username': _unameController.text,
       'password': _pwdController.text
     };
-    DioManger.getInstance().post(
+
+    await Global.saveSP(
+        "url",
         "http://" +
             _seversIPController.text +
             ":" +
             _seversPortController.text +
-            "/login",
-        params,
-        params, (data) {
-      setState(() {
-        // {"msg":"登录成功","code":1,"type":3,"memberId":4}
+            "/");
 
-        LoginEntity loginEntity = LoginEntity.fromJson(json.decode(data.toString()));
-        saveSP("userId", loginEntity.memberId);
-        saveSP("type", loginEntity.type);
-        saveSP(
-            "url",
-            "http://" +
-                _seversIPController.text +
-                ":" +
-                _seversPortController.text +
-                "/");
-        print("登录成功：" + data.toString());
-        showToast("登录成功");
-        Navigator.of(context).pop();
-        FocusScope.of(context).requestFocus(FocusNode());
-        Navigator.of(context).pop();
-        Navigator.pushNamed(context, "home");
-      });
-    }, (error) {
-      setState(() {});
-      print("登录异常：" + error.toString());
-      showToast("登录异常");
-      Navigator.of(context).pop();
-    });
+    LoginEntity loginEntity = await Git(context).login(params);
+
+    Global.saveSPInt("userId", loginEntity.memberId);
+    Global.saveSPInt("type", loginEntity.type);
+
+    showToast("登录成功");
+    Navigator.of(context).pop();
+    FocusScope.of(context).requestFocus(FocusNode());
+    Navigator.of(context).pop();
+    Navigator.pushNamed(context, "home");
+
+//    DioManger.getInstance().post(
+//        "http://" +
+//            _seversIPController.text +
+//            ":" +
+//            _seversPortController.text +
+//            "/login",
+//        params,
+//        null, (data) {
+//      setState(() {
+//        // {"msg":"登录成功","code":1,"type":3,"memberId":4}
+//
+//        LoginEntity loginEntity = LoginEntity.fromJson(json.decode(data.toString()));
+
+//      });
+//    }, (error) {
+//      setState(() {});
+//      print("登录异常：" + error.toString());
+//      showToast("登录异常");
+//      Navigator.of(context).pop();
+//    });
   }
 }
