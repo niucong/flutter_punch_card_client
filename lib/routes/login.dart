@@ -14,13 +14,22 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginState extends State<LoginPage> {
-  TextEditingController _seversIPController = new TextEditingController();
+  TextEditingController _seversIPController =
+      new TextEditingController.fromValue(TextEditingValue(
+    text: '192.168.1.105',
+  ));
   TextEditingController _seversPortController =
       new TextEditingController.fromValue(TextEditingValue(
     text: '8080',
   ));
-  TextEditingController _unameController = new TextEditingController();
-  TextEditingController _pwdController = new TextEditingController();
+  TextEditingController _unameController =
+      new TextEditingController.fromValue(TextEditingValue(
+    text: '15210537077',
+  ));
+  TextEditingController _pwdController =
+      new TextEditingController.fromValue(TextEditingValue(
+    text: '123',
+  ));
   bool pwdShow = false;
 
   @override

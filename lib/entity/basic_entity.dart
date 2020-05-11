@@ -1,11 +1,18 @@
-/**
- * 网络结果数据
- * Created by chenjianrun
- * Date: 2018-07-16
- */
 class BasicEntity {
+  String msg;
   int code;
-  var msg;
 
-  BasicEntity(this.code, this.msg);
+  BasicEntity({this.msg, this.code});
+
+  BasicEntity.fromJson(Map<String, dynamic> json) {
+    msg = json['msg'];
+    code = json['code'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['msg'] = this.msg;
+    data['code'] = this.code;
+    return data;
+  }
 }

@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:punchcardclient/entity/basic_entity.dart';
 import 'package:punchcardclient/entity/calendar_list_entity.dart';
 import 'package:punchcardclient/entity/login_entity.dart';
+import 'package:punchcardclient/entity/member_list_enity.dart';
 import 'package:punchcardclient/entity/plan_list_entity.dart';
 import 'package:punchcardclient/entity/sign_list_entity.dart';
 import 'package:punchcardclient/entity/vacate_list_entity.dart';
@@ -79,6 +81,25 @@ class Git {
     return SignListEntity.fromJson(json.decode(r.data));
   }
 
+  //获取成员列表
+  Future<MemberListEntity> getMemberList(Map params) async {
+//    setProxy();
+    String url = await Global.getSP("url");
+    print(url + "memberList");
+    print(params);
+    userId = await Global.getSPInt("userId");
+    print("userId:" + userId.toString());
+    var r = await dio.post(
+      url + "memberList",
+      data: params,
+      options: _options.merge(
+        headers: httpHeaders,
+      ),
+    );
+    print(r);
+    return MemberListEntity.fromJson(json.decode(r.data));
+  }
+
   //获取计划列表
   Future<PlanListEntity> getPlanList(Map params) async {
 //    setProxy();
@@ -96,6 +117,25 @@ class Git {
     );
     print(r);
     return PlanListEntity.fromJson(json.decode(r.data));
+  }
+
+  //请假
+  Future<BasicEntity> vacate(Map params) async {
+//    setProxy();
+    String url = await Global.getSP("url");
+    print(url + "vacate");
+    print(params);
+    userId = await Global.getSPInt("userId");
+    print("userId:" + userId.toString());
+    var r = await dio.post(
+      url + "vacate",
+      data: params,
+      options: _options.merge(
+        headers: httpHeaders,
+      ),
+    );
+    print(r);
+    return BasicEntity.fromJson(json.decode(r.data));
   }
 
   //获取请假列表

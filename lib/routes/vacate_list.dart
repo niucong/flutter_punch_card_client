@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:punchcardclient/common/git_api.dart';
 import 'package:punchcardclient/entity/vacate_list_entity.dart';
+import 'package:punchcardclient/routes/vacate.dart';
 
 class VacateListRoute extends StatefulWidget {
   @override
@@ -36,7 +37,7 @@ class _VacateListRouteState extends State<VacateListRoute> {
       await Git(context).getVacateList(
         {
           'offset': listData.length,
-          'pageSize': 3,
+          'pageSize': 5,
         },
       ).then((VacateListEntity signListEntity) {
         setState(() {
@@ -67,11 +68,16 @@ class _VacateListRouteState extends State<VacateListRoute> {
               this.SelectView(Icons.add, '新建', 'A'),
               this.SelectView(Icons.date_range, '按日期查询', 'B'),
             ],
-            onSelected: (String action) {
+            onSelected: (String action) async {
               // 点击选项的时候
               switch (action) {
                 case 'A':
-                  Navigator.pushNamed(context, "plan");
+                  var result = await Navigator.pushNamed(context, "vacate");
+                  //输出`TipRoute`路由返回结果
+                  print("路由返回值: $result");
+                  if (result) {
+                    _onRefresh();
+                  }
                   break;
                 case 'B':
                   break;
@@ -198,54 +204,74 @@ class ListItemWidget extends StatelessWidget {
           .toString()
           .substring(0, 16);
     }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            (index + 1).toString(),
-            textAlign: TextAlign.center,
+    return InkWell(
+      onTap: () async {
+        var result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return VacateRoute(
+                // 路由参数
+                listItem: listItem,
+              );
+            },
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            listItem.name,
-            textAlign: TextAlign.center,
+        );
+        //输出`TipRoute`路由返回结果
+        print("路由返回值: $result");
+//        if (result) {
+//          _onRefresh();
+//        }
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: Text(
+              (index + 1).toString(),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            listItem.type == 1
-                ? "事假"
-                : listItem.type == 2
-                    ? "病假"
-                    : listItem.type == 3
-                        ? "年假"
-                        : listItem.type == 4 ? "调休" : "其它",
-            textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: Text(
+              listItem.name,
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            DateTime.fromMillisecondsSinceEpoch(listItem.startTime)
-                .toLocal()
-                .toString()
-                .substring(0, 16),
-            textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: Text(
+              listItem.type == 1
+                  ? "事假"
+                  : listItem.type == 2
+                      ? "病假"
+                      : listItem.type == 3
+                          ? "年假"
+                          : listItem.type == 4 ? "调休" : "其它",
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            time,
-            textAlign: TextAlign.center,
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: Text(
+              DateTime.fromMillisecondsSinceEpoch(listItem.startTime)
+                  .toLocal()
+                  .toString()
+                  .substring(0, 16),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-      ],
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+            child: Text(
+              time,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
