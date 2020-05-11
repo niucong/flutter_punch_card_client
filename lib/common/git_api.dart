@@ -10,6 +10,7 @@ import 'package:punchcardclient/entity/calendar_list_entity.dart';
 import 'package:punchcardclient/entity/login_entity.dart';
 import 'package:punchcardclient/entity/member_list_enity.dart';
 import 'package:punchcardclient/entity/plan_list_entity.dart';
+import 'package:punchcardclient/entity/schedule_list_entity.dart';
 import 'package:punchcardclient/entity/sign_list_entity.dart';
 import 'package:punchcardclient/entity/vacate_list_entity.dart';
 
@@ -174,6 +175,25 @@ class Git {
     );
     print(r);
     return CalendarListEntity.fromJson(json.decode(r.data));
+  }
+
+  //获取作息表
+  Future<ScheduleListEntity> getScheduleList(Map params) async {
+//    setProxy();
+    String url = await Global.getSP("url");
+    print(url + "scheduleList");
+    print(params);
+    userId = await Global.getSPInt("userId");
+    print("userId:" + userId.toString());
+    var r = await dio.post(
+      url + "scheduleList",
+      data: params,
+      options: _options.merge(
+        headers: httpHeaders,
+      ),
+    );
+    print(r);
+    return ScheduleListEntity.fromJson(json.decode(r.data));
   }
 
   /// 自定义Header

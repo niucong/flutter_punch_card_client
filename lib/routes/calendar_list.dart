@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:punchcardclient/common/git_api.dart';
+import 'package:punchcardclient/db/database.dart';
 import 'package:punchcardclient/entity/calendar_list_entity.dart';
 
 class CalendarListRoute extends StatefulWidget {
@@ -16,15 +17,19 @@ class _CalendarListRouteState extends State<CalendarListRoute> {
     _retrieveData();
   }
 
-  void _retrieveData() {
-    Git(context).getCalendarList(
-      {},
-    ).then((CalendarListEntity signListEntity) {
-      setState(() {
-        print(signListEntity.list.length);
-        listData.addAll(signListEntity.list);
-      });
-    });
+  void _retrieveData() async {
+    final database =
+        await $FloorFlutterDatabase.databaseBuilder('database.db').build();
+    listData.addAll(await database.calendarDao.findCalendar());
+    if (listData.isEmpty) {
+      var listEntity = await Git(context).getCalendarList(
+        {},
+      );
+      listData.addAll(listEntity.list);
+      for (int i = 0; i < listData.length; i++)
+        await database.calendarDao.insertCalendar(listData[i]);
+    }
+    setState(() {});
   }
 
   @override
@@ -159,7 +164,7 @@ class _CalendarListRouteState extends State<CalendarListRoute> {
     return ListItemWidget(index, listData[index]);
   }
 
-  final List<CalendarList> listData = [];
+  final List<Calendar> listData = [];
 
   // 返回每个隐藏的菜单项
   SelectView(IconData icon, String text, String id) {
@@ -176,7 +181,7 @@ class _CalendarListRouteState extends State<CalendarListRoute> {
 }
 
 class ListItemWidget extends StatelessWidget {
-  final CalendarList listItem;
+  final Calendar listItem;
   final int index;
 
   ListItemWidget(this.index, this.listItem);

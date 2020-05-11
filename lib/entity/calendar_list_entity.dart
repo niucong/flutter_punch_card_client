@@ -1,7 +1,9 @@
+import 'package:floor/floor.dart';
+
 class CalendarListEntity {
   String msg;
   int code;
-  List<CalendarList> list;
+  List<Calendar> list;
 
   CalendarListEntity({this.msg, this.code, this.list});
 
@@ -9,9 +11,9 @@ class CalendarListEntity {
     msg = json['msg'];
     code = json['code'];
     if (json['list'] != null) {
-      list = new List<CalendarList>();
+      list = new List<Calendar>();
       json['list'].forEach((v) {
-        list.add(new CalendarList.fromJson(v));
+        list.add(new Calendar.fromJson(v));
       });
     }
   }
@@ -27,7 +29,8 @@ class CalendarListEntity {
   }
 }
 
-class CalendarList {
+@entity
+class Calendar {
   String sunday;
   String saturday;
   String tuesday;
@@ -36,11 +39,12 @@ class CalendarList {
   String wednesday;
   String thursday;
   String friday;
+  @primaryKey
   int id;
   String weekly;
   String monday;
 
-  CalendarList(
+  Calendar(
       {this.sunday,
       this.saturday,
       this.tuesday,
@@ -53,7 +57,7 @@ class CalendarList {
       this.weekly,
       this.monday});
 
-  CalendarList.fromJson(Map<String, dynamic> json) {
+  Calendar.fromJson(Map<String, dynamic> json) {
     sunday = json['sunday'];
     saturday = json['saturday'];
     tuesday = json['tuesday'];

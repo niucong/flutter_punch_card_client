@@ -28,12 +28,14 @@ dependencies:
   fluttertoast: ^3.0.3
   shared_preferences: ^0.5.1+1
   dio: ^3.0.3
-
   flukit: ^1.0.2
+  floor: ^0.12.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  floor_generator: ^0.12.0
+  build_runner: ^1.7.3
 
 
 # For information on the generic Dart part of this file, see the

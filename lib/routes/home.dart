@@ -92,7 +92,7 @@ class _HomeRouteState extends State<HomeRoute> {
               textScaleFactor: 1.3,
             ),
             onPressed: () {
-              showToast("作息表");
+              Navigator.pushNamed(context, "schedule_list");
             },
           ),
           RaisedButton(

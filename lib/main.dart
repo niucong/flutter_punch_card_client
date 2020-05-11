@@ -5,6 +5,7 @@ import 'package:punchcardclient/routes/home.dart';
 import 'package:punchcardclient/routes/login.dart';
 import 'package:punchcardclient/routes/plan.dart';
 import 'package:punchcardclient/routes/plan_list.dart';
+import 'package:punchcardclient/routes/schedule_list.dart';
 import 'package:punchcardclient/routes/sign_list.dart';
 import 'package:punchcardclient/routes/vacate.dart';
 import 'package:punchcardclient/routes/vacate_list.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         "vacate_list": (context) => VacateListRoute(),
         "vacate": (context) => VacateRoute(),
         "calendar_list": (context) => CalendarListRoute(),
+        "schedule_list": (context) => ScheduleListRoute(),
       },
     );
   }
