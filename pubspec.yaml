@@ -33,8 +33,8 @@ dependencies:
 
   jpush_flutter: 0.5.3
 
-#  bdmap_location_flutter_plugin:
-#    path: plugins/bdmap_location_flutter_plugin
+  bdmap_location_flutter_plugin:
+    path: plugins/bdmap_location_flutter_plugin
 
 dev_dependencies:
   flutter_test:
