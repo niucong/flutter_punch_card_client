@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jpush_flutter/jpush_flutter.dart';
 import 'package:punchcardclient/common/funs.dart';
+import 'package:punchcardclient/common/git_api.dart';
 import 'package:punchcardclient/common/global.dart';
 
 class HomeRoute extends StatefulWidget {
@@ -179,117 +180,139 @@ class _HomeRouteState extends State<HomeRoute> {
       });
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('打卡客户端'),
-        leading: new Icon(Icons.home),
-        actions: <Widget>[
-          // 非隐藏的菜单
-          new IconButton(
-              icon: new Icon(Icons.exit_to_app),
-              tooltip: '退出',
+    return WillPopScope(
+      // 编写onWillPop逻辑
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('打卡客户端'),
+          leading: new Icon(Icons.home),
+          actions: <Widget>[
+            // 非隐藏的菜单
+            new IconButton(
+                icon: new Icon(Icons.exit_to_app),
+                tooltip: '退出',
+                onPressed: () {
+                  Global.saveSP("url", "");
+                  Navigator.of(context).pop();
+                  Navigator.pushNamed(context, "login");
+                }),
+          ],
+        ),
+        body: Center(
+            child: GridView.count(
+          crossAxisCount: 3,
+          childAspectRatio: 1.0,
+          //水平子Widget之间间距
+          crossAxisSpacing: 10.0,
+          //垂直子Widget之间间距
+          mainAxisSpacing: 10.0,
+          //GridView内边距
+          padding: EdgeInsets.all(10.0),
+          children: <Widget>[
+            RaisedButton(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                "点击打卡",
+                textScaleFactor: 1.2,
+              ),
               onPressed: () {
-                Global.saveSP("url", "");
-                Navigator.of(context).pop();
-                Navigator.pushNamed(context, "login");
-              }),
-        ],
-      ),
-      body: Center(
-          child: GridView.count(
-        crossAxisCount: 3,
-        childAspectRatio: 1.0,
-        //水平子Widget之间间距
-        crossAxisSpacing: 10.0,
-        //垂直子Widget之间间距
-        mainAxisSpacing: 10.0,
-        //GridView内边距
-        padding: EdgeInsets.all(10.0),
-        children: <Widget>[
-          RaisedButton(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              "点击打卡",
-              textScaleFactor: 1.3,
+//                showToast("点击打卡");
+                Git(context).sign(
+                  {},
+                ).then((value) => showToast(value.msg));
+              },
             ),
-            onPressed: () {
-              showToast("课程表");
-            },
-          ),
-          RaisedButton(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              "查看计划",
-              textScaleFactor: 1.3,
+            RaisedButton(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                "查看计划",
+                textScaleFactor: 1.2,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "plan_list");
+              },
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, "plan_list");
-            },
-          ),
-          RaisedButton(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              "查看项目",
-              textScaleFactor: 1.3,
+            RaisedButton(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                "查看项目",
+                textScaleFactor: 1.2,
+              ),
+              onPressed: () {
+                showToast("查看项目");
+              },
             ),
-            onPressed: () {
-              showToast("查看项目");
-            },
-          ),
-          RaisedButton(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              "课程表",
-              textScaleFactor: 1.3,
+            RaisedButton(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                "课程表",
+                textScaleFactor: 1.2,
+              ),
+              onPressed: () {
+                _simpleDialog();
+              },
             ),
-            onPressed: () {
-              _simpleDialog();
-            },
-          ),
-          RaisedButton(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              "作息表",
-              textScaleFactor: 1.3,
+            RaisedButton(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                "作息表",
+                textScaleFactor: 1.2,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "schedule_list");
+              },
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, "schedule_list");
-            },
-          ),
-          RaisedButton(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              "校历",
-              textScaleFactor: 1.3,
+            RaisedButton(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                "校历",
+                textScaleFactor: 1.2,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "calendar_list");
+              },
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, "calendar_list");
-            },
-          ),
-          RaisedButton(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              "查看考勤",
-              textScaleFactor: 1.3,
+            RaisedButton(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                "查看考勤",
+                textScaleFactor: 1.2,
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, "sign_list");
+              },
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, "sign_list");
-            },
-          ),
-          RaisedButton(
-            padding: const EdgeInsets.all(15.0),
-            child: Text(
-              "查看假条",
-              textScaleFactor: 1.3,
-            ),
-            onPressed: () {
+            RaisedButton(
+              padding: const EdgeInsets.all(15.0),
+              child: Text(
+                "查看假条",
+                textScaleFactor: 1.2,
+              ),
+              onPressed: () {
 //              showToast("查看假条");
-              Navigator.pushNamed(context, "vacate_list");
-            },
-          ),
-        ],
-      )), // 构建主页面
+                Navigator.pushNamed(context, "vacate_list");
+              },
+            ),
+          ],
+        )), // 构建主页面
+      ),
     );
+  }
+
+  int last = 0;
+
+  // 返回键拦截执行方法
+  Future<bool> _onWillPop() {
+    int now = DateTime.now().millisecondsSinceEpoch;
+    print(now - last);
+    if (now - last > 1000) {
+      last = now;
+      showToast("再按一次返回键退出");
+      return Future.value(false); //不退出
+    } else {
+      return Future.value(true); //退出
+    }
   }
 
   _simpleDialog() async {
@@ -388,6 +411,7 @@ class _HomeRouteState extends State<HomeRoute> {
                   title: Text('分享 A'),
                   onTap: () {
                     Navigator.pop(context, '分享A');
+                    Navigator.pushNamed(context, "show_case");
                   },
                 ),
                 Divider(),
@@ -395,6 +419,7 @@ class _HomeRouteState extends State<HomeRoute> {
                   title: Text('分享 B'),
                   onTap: () {
                     Navigator.pop(context, '分享B');
+                    Navigator.pushNamed(context, "image_picker");
                   },
                 ),
                 Divider(),

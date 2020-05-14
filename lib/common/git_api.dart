@@ -64,6 +64,25 @@ class Git {
     return loginEntity;
   }
 
+  // 签到接口
+  Future<BasicEntity> sign(Map params) async {
+    String url = await Global.getSP("url");
+    print(url + "sign");
+    print(params);
+    userId = await Global.getSPInt("userId");
+
+    var r = await dio.post(
+      url + "sign",
+      data: params,
+      options: _options.merge(
+        headers: httpHeaders,
+      ),
+    );
+    print("data:" + r.data);
+    BasicEntity entity = BasicEntity.fromJson(json.decode(r.data));
+    return entity;
+  }
+
   // 获取考勤列表
   Future<SignListEntity> getSignList(Map params) async {
     String url = await Global.getSP("url");
@@ -99,6 +118,25 @@ class Git {
     );
     print(r);
     return MemberListEntity.fromJson(json.decode(r.data));
+  }
+
+  //计划
+  Future<BasicEntity> plan(Map params) async {
+//    setProxy();
+    String url = await Global.getSP("url");
+    print(url + "plan");
+    print(params);
+    userId = await Global.getSPInt("userId");
+    print("userId:" + userId.toString());
+    var r = await dio.post(
+      url + "plan",
+      data: params,
+      options: _options.merge(
+        headers: httpHeaders,
+      ),
+    );
+    print(r);
+    return BasicEntity.fromJson(json.decode(r.data));
   }
 
   //获取计划列表

@@ -209,15 +209,28 @@ class _VacateRouteState extends State<VacateRoute> {
     );
   }
 
+  Future<DateTime> _showDatePicker1() {
+    var date = DateTime.now();
+    return showDatePicker(
+      context: context,
+      initialDate: date,
+      firstDate: date,
+      lastDate: date.add(
+        Duration(days: 30),
+      ),
+    );
+  }
+
   _showDataTimePicker(int type) async {
     if (!isDetail) {
       Locale myLocale = Localizations.localeOf(context);
+//      const Locale myLocale = Locale('fr', 'CH');
       var pickerDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(2020),
         lastDate: DateTime(2022),
-        locale: myLocale,
+        locale: Locale('zh'),
       );
       var pickerTime =
           await showTimePicker(context: context, initialTime: TimeOfDay.now());

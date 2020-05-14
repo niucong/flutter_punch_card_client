@@ -10,7 +10,7 @@ class LoginPage extends StatefulWidget {
   final String title;
 
   @override
-  _LoginState createState() => _LoginState();
+  _LoginState createState()  => _LoginState();
 }
 
 class _LoginState extends State<LoginPage> {
@@ -31,15 +31,6 @@ class _LoginState extends State<LoginPage> {
     text: '123',
   ));
   bool pwdShow = false;
-
-  @override
-  void initState() {
-    super.initState();
-//    if(getSP("url").toString().isNotEmpty){
-//      Navigator.of(context).pop();
-//      Navigator.pushNamed(context, "home");
-//    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +130,7 @@ class _LoginState extends State<LoginPage> {
   }
 
   void _onLogin() async {
-    showLoading(context);
+    showLoading(context, "正在登录中……");
     var params = {
       'username': _unameController.text,
       'password': _pwdController.text
@@ -163,26 +154,5 @@ class _LoginState extends State<LoginPage> {
     FocusScope.of(context).requestFocus(FocusNode());
     Navigator.of(context).pop();
     Navigator.pushNamed(context, "home");
-
-//    DioManger.getInstance().post(
-//        "http://" +
-//            _seversIPController.text +
-//            ":" +
-//            _seversPortController.text +
-//            "/login",
-//        params,
-//        null, (data) {
-//      setState(() {
-//        // {"msg":"登录成功","code":1,"type":3,"memberId":4}
-//
-//        LoginEntity loginEntity = LoginEntity.fromJson(json.decode(data.toString()));
-
-//      });
-//    }, (error) {
-//      setState(() {});
-//      print("登录异常：" + error.toString());
-//      showToast("登录异常");
-//      Navigator.of(context).pop();
-//    });
   }
 }

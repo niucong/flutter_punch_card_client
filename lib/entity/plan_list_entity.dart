@@ -32,7 +32,7 @@ class PlanListEntity {
 
 class PlanList {
   int createTime;
-  int forceFinish;
+  int forceFinish; // 0正常、1被取消（开始之前可以取消）、2被终止（开始以后只能终止）
   String members;
   String name;
   int creatorId;

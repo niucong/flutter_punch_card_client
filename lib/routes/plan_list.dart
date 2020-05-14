@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:punchcardclient/common/event_bus.dart';
 import 'package:punchcardclient/common/git_api.dart';
-import 'package:punchcardclient/entity/member_list_enity.dart';
 import 'package:punchcardclient/entity/plan_list_entity.dart';
 import 'package:punchcardclient/routes/plan.dart';
 
@@ -27,7 +27,13 @@ class _PlanListRouteState extends State<PlanListRoute> {
         _getData();
       }
     });
+
+    //监听刷新事件
+    bus.on("refreshPlan", (arg) {
+      _onRefresh();
+    });
   }
+
 
   /**
    * 上拉加载更多
@@ -40,7 +46,7 @@ class _PlanListRouteState extends State<PlanListRoute> {
       await Git(context).getPlanList(
         {
           'offset': listData.length,
-          'pageSize': 5,
+          'pageSize': 10,
         },
       ).then((PlanListEntity signListEntity) {
         setState(() {
@@ -75,7 +81,7 @@ class _PlanListRouteState extends State<PlanListRoute> {
               // 点击选项的时候
               switch (action) {
                 case 'A':
-                  var result = await Navigator.pushNamed(context, "vacate");
+                  var result = await Navigator.pushNamed(context, "plan");
                   //输出`TipRoute`路由返回结果
                   print("路由返回值: $result");
                   if (result) {
@@ -159,6 +165,7 @@ class _PlanListRouteState extends State<PlanListRoute> {
   }
 
   Widget _renderRow(BuildContext context, int index) {
+    print(index.toString() + "######" + listData.length.toString());
     if (index < listData.length) {
       return ListItemWidget(index, listData[index]);
     } else if (index == allSize) {
@@ -196,37 +203,59 @@ class ListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(listItem.startTime);
-
-    // [{\"id\":3,\"name\":\"张帆\"},{\"id\":1,\"name\":\"主任\"}]
     var members = "";
-    List jsons = json.decode(listItem.members);
-    List<MemberEntity> memberList =
-        jsons.map((m) => new MemberEntity.fromJson(m)).toList();
-    for (int i = 0; i < memberList.length; i++) {
-      members += "，" + memberList[i].name;
+    List list = json.decode(listItem.members);
+    for (int i = 0; i < list.length; i++) {
+      members += ";" + list[i]["name"];
     }
-    if (members.isNotEmpty) {
+    if (members.length > 0) {
       members = members.substring(1);
+    }
+    var status;
+    var color;
+    if (listItem.forceFinish == 0) {
+      if (listItem.startTime > new DateTime.now().millisecondsSinceEpoch) {
+        status = "未开始";
+        color = Colors.blue;
+      } else if (listItem.endTime > new DateTime.now().millisecondsSinceEpoch) {
+        status = "进行中";
+        color = Colors.green;
+      } else {
+        status = "已结束";
+        color = Colors.black26;
+      }
+    } else if (listItem.forceFinish == 1) {
+      status = "已取消";
+      color = Colors.orange;
+    } else {
+      status = "已终止";
+      color = Colors.red;
     }
     return InkWell(
       onTap: () async {
         var result = await Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) {
-              return PlanRoute(
+          PageRouteBuilder(
+            transitionDuration: Duration(milliseconds: 1000), //动画时间为500毫秒
+            pageBuilder: (BuildContext context, Animation animation,
+                Animation secondaryAnimation) {
+              return new FadeTransition(
+                //使用渐隐渐入过渡,
+                opacity: animation,
+                child: PlanRoute(
                   // 路由参数
-//                listItem: listItem,
-                  );
+                  listItem: listItem,
+                ), //路由B
+              );
             },
           ),
         );
         //输出`TipRoute`路由返回结果
         print("路由返回值: $result");
-//        if (result) {
-//          _onRefresh();
-//        }
+        if (result) {
+          //编辑成功后触发刷新事件
+          bus.emit("refreshPlan", result);
+        }
       },
       child: Container(
         margin: EdgeInsets.all(10),
@@ -255,9 +284,12 @@ class ListItemWidget extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Text(
-                    "已结束",
+                    status,
                     textScaleFactor: 1.3,
                     textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: color,
+                    ),
                   ),
                 ),
               ],
@@ -270,7 +302,7 @@ class ListItemWidget extends StatelessWidget {
                   Expanded(
                     flex: 0,
                     child: Text(
-                      listItem.creatorName,
+                      "创建者：" + listItem.creatorName,
                       textScaleFactor: 1.3,
                     ),
                   ),
@@ -306,7 +338,7 @@ class ListItemWidget extends StatelessWidget {
                             .toLocal()
                             .toString()
                             .substring(0, 16),
-                    textScaleFactor: 1.2,
+                    textScaleFactor: 1.1,
                     textAlign: TextAlign.left,
                   ),
                 ),
@@ -318,11 +350,26 @@ class ListItemWidget extends StatelessWidget {
                             .toLocal()
                             .toString()
                             .substring(0, 16),
-                    textScaleFactor: 1.2,
+                    textScaleFactor: 1.1,
                     textAlign: TextAlign.right,
                   ),
                 ),
               ],
+            ),
+            Visibility(
+              visible: listItem.editTime > 0,
+              child: Container(
+                margin: EdgeInsets.only(top: 5),
+                child: Text(
+                  "修改时间：" +
+                      DateTime.fromMillisecondsSinceEpoch(listItem.editTime)
+                          .toLocal()
+                          .toString()
+                          .substring(0, 16),
+                  textAlign: TextAlign.right,
+                  textScaleFactor: 1.2,
+                ),
+              ),
             ),
           ],
         ),

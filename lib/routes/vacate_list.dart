@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:punchcardclient/common/event_bus.dart';
 import 'package:punchcardclient/common/git_api.dart';
 import 'package:punchcardclient/entity/vacate_list_entity.dart';
 import 'package:punchcardclient/routes/vacate.dart';
@@ -23,6 +24,11 @@ class _VacateListRouteState extends State<VacateListRoute> {
         print('滑动到了最底部');
         _getData();
       }
+    });
+
+    //监听刷新事件
+    bus.on("refreshVacate", (arg) {
+      _onRefresh();
     });
   }
 
@@ -86,15 +92,6 @@ class _VacateListRouteState extends State<VacateListRoute> {
           ),
         ],
       ),
-//      body: RefreshIndicator(
-//        onRefresh: _onRefresh,
-//        child: ListView.builder(
-//          itemBuilder: _renderRow,
-//          itemCount: listData.length + 1,
-//          controller: _scrollController,
-//        ),
-//      ),
-
       body: Wrap(
         children: <Widget>[
           Container(
@@ -197,13 +194,6 @@ class ListItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print(listItem.startTime);
-    var time = "";
-    if (listItem.endTime > 0) {
-      time = DateTime.fromMillisecondsSinceEpoch(listItem.endTime)
-          .toLocal()
-          .toString()
-          .substring(0, 16);
-    }
     return InkWell(
       onTap: () async {
         var result = await Navigator.push(
@@ -219,58 +209,102 @@ class ListItemWidget extends StatelessWidget {
         );
         //输出`TipRoute`路由返回结果
         print("路由返回值: $result");
-//        if (result) {
-//          _onRefresh();
-//        }
+        if (result) {
+          //编辑成功后触发刷新事件
+          bus.emit("refreshVacate", result);
+        }
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-            child: Text(
-              (index + 1).toString(),
-              textAlign: TextAlign.center,
+      child: Container(
+        margin: EdgeInsets.all(10),
+        child: Wrap(
+          children: <Widget>[
+            Flex(
+              direction: Axis.horizontal,
+              children: <Widget>[
+                Expanded(
+                  flex: 0,
+                  child: Text(
+                    (index + 1).toString(),
+                    textScaleFactor: 1.3,
+                  ),
+                ),
+                Expanded(
+                  flex: 0,
+                  child: Container(
+                    margin: EdgeInsets.only(left: 10),
+                    child: Text(
+                      listItem.name,
+                      textScaleFactor: 1.3,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    "类型：" +
+                        (listItem.type == 1
+                            ? "事假"
+                            : listItem.type == 2
+                                ? "病假"
+                                : listItem.type == 3
+                                    ? "年假"
+                                    : listItem.type == 4 ? "调休" : "其它"),
+                    textScaleFactor: 1.3,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Expanded(
+                  flex: 0,
+                  child: Text(
+                    "已结束",
+                    textScaleFactor: 1.3,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-            child: Text(
-              listItem.name,
-              textAlign: TextAlign.center,
+            Container(
+              margin: EdgeInsets.only(top: 5, bottom: 5),
+              child: Text(
+                "提交时间：" +
+                    DateTime.fromMillisecondsSinceEpoch(listItem.createTime)
+                        .toLocal()
+                        .toString()
+                        .substring(0, 16),
+                textScaleFactor: 1.3,
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-            child: Text(
-              listItem.type == 1
-                  ? "事假"
-                  : listItem.type == 2
-                      ? "病假"
-                      : listItem.type == 3
-                          ? "年假"
-                          : listItem.type == 4 ? "调休" : "其它",
-              textAlign: TextAlign.center,
+            Flex(
+              direction: Axis.horizontal,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    "起：" +
+                        DateTime.fromMillisecondsSinceEpoch(listItem.startTime)
+                            .toLocal()
+                            .toString()
+                            .substring(0, 16),
+                    textScaleFactor: 1.2,
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                    "止：" +
+                        DateTime.fromMillisecondsSinceEpoch(listItem.endTime)
+                            .toLocal()
+                            .toString()
+                            .substring(0, 16),
+                    textScaleFactor: 1.2,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-            child: Text(
-              DateTime.fromMillisecondsSinceEpoch(listItem.startTime)
-                  .toLocal()
-                  .toString()
-                  .substring(0, 16),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-            child: Text(
-              time,
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

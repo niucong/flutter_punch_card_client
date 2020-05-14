@@ -9,26 +9,38 @@ class SignListRoute extends StatefulWidget {
 }
 
 class _SignListRouteState extends State<SignListRoute> {
+  ScrollController _scrollController = ScrollController(); //listv
+  bool isLoading = false; //是否正在加载数据
+
   @override
   void initState() {
     super.initState();
     listData.clear();
-    _retrieveData();
+    _getData();
   }
 
-  void _retrieveData() {
-    Git(context).getSignList(
-      {
-        'offset': listData.length,
-        'pageSize': 10,
-      },
-    ).then((SignListEntity signListEntity) {
+  /**
+   * 上拉加载更多
+   */
+  Future _getData() async {
+    if (!isLoading) {
       setState(() {
-        allSize = signListEntity.allSize;
-        print(signListEntity.list.length);
-        listData.addAll(signListEntity.list);
+        isLoading = true;
       });
-    });
+      await Git(context).getSignList(
+        {
+          'offset': listData.length,
+          'pageSize': 10,
+        },
+      ).then((SignListEntity signListEntity) {
+        setState(() {
+          allSize = signListEntity.allSize;
+          print(signListEntity.list.length);
+          listData.addAll(signListEntity.list);
+          isLoading = false;
+        });
+      });
+    }
   }
 
   @override
@@ -62,55 +74,83 @@ class _SignListRouteState extends State<SignListRoute> {
               ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                // flex设置权重
-                flex: 2,
-                child: Text(
-                  '序号',
-                  textAlign: TextAlign.center,
-                ),
+          Container(
+            margin: EdgeInsets.only(bottom: 10),
+            child: DefaultTextStyle(
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 15.0,
               ),
-              Expanded(
-                // flex设置权重
-                flex: 2,
-                child: Text(
-                  '姓名',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Expanded(
-                // flex设置权重
-                flex: 5,
-                child: Text(
-                  '到来时间',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              Expanded(
-                // flex设置权重
-                flex: 5,
-                child: Text(
-                  '离开时间',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-          ),
-          ListView.separated(
-              shrinkWrap: true,
-              itemBuilder: _renderRow,
-              physics: AlwaysScrollableScrollPhysics(),
-              //设置physics属性总是可滚动
-              separatorBuilder: (context, index) => Divider(
-                    height: .0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    // flex设置权重
+                    flex: 2,
+                    child: Text(
+                      '序号',
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-              itemCount: listData.length + 1),
+                  Expanded(
+                    // flex设置权重
+                    flex: 2,
+                    child: Text(
+                      '姓名',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Expanded(
+                    // flex设置权重
+                    flex: 5,
+                    child: Text(
+                      '到来时间',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Expanded(
+                    // flex设置权重
+                    flex: 5,
+                    child: Text(
+                      '离开时间',
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          ),
+          RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height - 56 - 56 - 56,
+              child: ListView.separated(
+                shrinkWrap: true,
+                physics: AlwaysScrollableScrollPhysics(),
+                itemBuilder: _renderRow,
+                itemCount: listData.length + 1,
+                controller: _scrollController,
+                //分割器构造器
+                separatorBuilder: (BuildContext context, int index) {
+                  return Divider(
+                    color: Colors.black12,
+                  );
+                },
+              ),
+            ),
+          ),
         ],
       ), // 构建主页面
     );
+  }
+
+  /**
+   * 下拉刷新方法,为list重新赋值
+   */
+  Future<Null> _onRefresh() async {
+    listData.clear();
+    _getData();
   }
 
   Widget _renderRow(BuildContext context, int index) {
@@ -179,84 +219,48 @@ class ListItemWidget extends StatelessWidget {
           .toString()
           .substring(0, 16);
     }
-//    return Container(
-//      margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
-//      child: Row(
-//        mainAxisAlignment: MainAxisAlignment.start,
-//        children: <Widget>[
-//          Expanded(
-//            // flex设置权重
-//            flex: 2,
-//            child: Text(
-//              (index + 1).toString(),
-//              textAlign: TextAlign.center,
-//            ),
-//          ),
-//          Expanded(
-//            // flex设置权重
-//            flex: 2,
-//            child: Text(
-//              listItem.name,
-//              textAlign: TextAlign.center,
-//            ),
-//          ),
-//          Expanded(
-//            // flex设置权重
-//            flex: 5,
-//            child: Text(
-//              DateTime.fromMillisecondsSinceEpoch(listItem.startTime)
-//                  .toLocal()
-//                  .toString()
-//                  .substring(0, 16),
-//              textAlign: TextAlign.center,
-//            ),
-//          ),
-//          Expanded(
-//            // flex设置权重
-//            flex: 5,
-//            child: Text(
-//              time,
-//              textAlign: TextAlign.center,
-//            ),
-//          ),
-//        ],
-//      ),
-//    );
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            (index + 1).toString(),
-            textAlign: TextAlign.center,
+    return Container(
+      margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            // flex设置权重
+            flex: 2,
+            child: Text(
+              (index + 1).toString(),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            listItem.name,
-            textAlign: TextAlign.center,
+          Expanded(
+            // flex设置权重
+            flex: 2,
+            child: Text(
+              listItem.name,
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            DateTime.fromMillisecondsSinceEpoch(listItem.startTime)
-                .toLocal()
-                .toString()
-                .substring(0, 16),
-            textAlign: TextAlign.center,
+          Expanded(
+            // flex设置权重
+            flex: 5,
+            child: Text(
+              DateTime.fromMillisecondsSinceEpoch(listItem.startTime)
+                  .toLocal()
+                  .toString()
+                  .substring(0, 16),
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
-          child: Text(
-            time,
-            textAlign: TextAlign.center,
+          Expanded(
+            // flex设置权重
+            flex: 5,
+            child: Text(
+              time,
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
