@@ -1,12 +1,13 @@
 package com.niucong.punchcardclient;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
+import com.alibaba.fastjson.JSON;
 import com.bin.david.form.core.SmartTable;
+import com.niucong.punchcardclient.db.ScheduleDB;
 import com.niucong.punchcardclient.table.Schedule;
 
 import java.util.ArrayList;
@@ -48,27 +49,33 @@ public class ScheduleActivity extends AppCompatActivity {
     }
 
     private void refreshScheduleList() {
-//        String listData = getIntent().getStringExtra("listData");
-//        Log.d("ScheduleActivity", listData);
-
         final List<Schedule> schedules = new ArrayList<>();
-//        for (ScheduleDB scheduleDB : LitePal.findAll(ScheduleDB.class)) {
-//            schedules.add(new Schedule(scheduleDB.getTimeRank(), scheduleDB.getSectionName(), scheduleDB.getTime()));
-//        }
-        String dataPath = getDatabasePath("database.db").getPath();
-        SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dataPath, null);
-        Cursor cur = db.rawQuery(
-                "select * from Schedule", new String[]{});
-        while (cur.moveToNext()) {
-            schedules.add(new Schedule(cur.getString(cur.getColumnIndex("timeRank")),
-                    cur.getString(cur.getColumnIndex("sectionName")),
-                    cur.getString(cur.getColumnIndex("time"))));
+
+        String listData = getIntent().getStringExtra("listData");
+        for (ScheduleDB scheduleDB : JSON.parseArray(listData, ScheduleDB.class)) {
+            schedules.add(new Schedule(scheduleDB.getTimeRank(), scheduleDB.getSectionName(), scheduleDB.getTime()));
         }
-        cur.close();
+
+//        String dataPath = getDatabasePath("database.db").getPath();
+//        SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dataPath, null);
+//        Cursor cur = db.rawQuery(
+//                "select * from Schedule", new String[]{});
+//        while (cur.moveToNext()) {
+//            schedules.add(new Schedule(cur.getString(cur.getColumnIndex("timeRank")),
+//                    cur.getString(cur.getColumnIndex("sectionName")),
+//                    cur.getString(cur.getColumnIndex("time"))));
+//        }
+//        cur.close();
 
         table.setData(schedules);
         table.getConfig().setShowTableTitle(false);
         table.setZoom(true, 2, 0.2f);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.getMenuInflater().inflate(R.menu.menu_refresh, menu);
+        return true;
     }
 
     @Override
@@ -78,9 +85,9 @@ public class ScheduleActivity extends AppCompatActivity {
             case android.R.id.home:
                 this.finish();
                 break;
-//            case R.id.action_refresh:
-//                getScheduleList();
-//                break;
+            case R.id.action_refresh:
+
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

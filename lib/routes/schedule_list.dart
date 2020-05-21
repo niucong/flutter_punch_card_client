@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:floor/floor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -42,13 +44,13 @@ class _ScheduleListRouteState extends State<ScheduleListRoute> {
         await database.scheduleDao.insertSchedule(listData[i]);
     }
 
-//    print(json.encode(listData));
-//    await platform.invokeMethod('toScheduleActivity', <String, dynamic>{
-////      'listData': json.encode(listData),
+    print(json.encode(listData));
+    await platform.invokeMethod('toScheduleActivity', <String, dynamic>{
+      'listData': json.encode(listData),
 //      'listData': 'listData',
-//    });
-    Navigator.pop(context);
-    await platform.invokeMethod('toScheduleActivity');
+    });
+//    Navigator.pop(context);
+//    await platform.invokeMethod('toScheduleActivity');
 
 //    setState(() {});
   }
