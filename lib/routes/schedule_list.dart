@@ -1,6 +1,7 @@
 import 'package:floor/floor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:punchcardclient/common/git_api.dart';
 import 'package:punchcardclient/db/database.dart';
 import 'package:punchcardclient/entity/schedule_list_entity.dart';
@@ -11,6 +12,9 @@ class ScheduleListRoute extends StatefulWidget {
 }
 
 class _ScheduleListRouteState extends State<ScheduleListRoute> {
+  static const platform =
+      const MethodChannel('punchcardclient.niucong.com/native');
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +41,16 @@ class _ScheduleListRouteState extends State<ScheduleListRoute> {
       for (int i = 0; i < listData.length; i++)
         await database.scheduleDao.insertSchedule(listData[i]);
     }
-    setState(() {});
+
+//    print(json.encode(listData));
+//    await platform.invokeMethod('toScheduleActivity', <String, dynamic>{
+////      'listData': json.encode(listData),
+//      'listData': 'listData',
+//    });
+    Navigator.pop(context);
+    await platform.invokeMethod('toScheduleActivity');
+
+//    setState(() {});
   }
 
   @override

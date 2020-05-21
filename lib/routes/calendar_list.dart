@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:punchcardclient/common/git_api.dart';
 import 'package:punchcardclient/db/database.dart';
 import 'package:punchcardclient/entity/calendar_list_entity.dart';
@@ -10,6 +11,9 @@ class CalendarListRoute extends StatefulWidget {
 }
 
 class _CalendarListRouteState extends State<CalendarListRoute> {
+  static const platform =
+      const MethodChannel('punchcardclient.niucong.com/native');
+
   @override
   void initState() {
     super.initState();
@@ -29,7 +33,11 @@ class _CalendarListRouteState extends State<CalendarListRoute> {
       for (int i = 0; i < listData.length; i++)
         await database.calendarDao.insertCalendar(listData[i]);
     }
-    setState(() {});
+
+    Navigator.pop(context);
+    await platform.invokeMethod('toCalendarActivity');
+
+//    setState(() {});
   }
 
   @override

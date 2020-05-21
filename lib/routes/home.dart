@@ -18,6 +18,7 @@ class HomeRoute extends StatefulWidget {
 }
 
 class _HomeRouteState extends State<HomeRoute> {
+
   // 百度定位
   Map<String, Object> _loationResult;
   BaiduLocation _baiduLocation;
@@ -259,7 +260,7 @@ class _HomeRouteState extends State<HomeRoute> {
                 "作息表",
                 textScaleFactor: 1.2,
               ),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pushNamed(context, "schedule_list");
               },
             ),
