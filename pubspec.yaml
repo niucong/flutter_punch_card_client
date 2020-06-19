@@ -43,10 +43,10 @@ dependencies:
   flutter_spinkit: ^4.1.2+1 #进度
   image_picker: ^0.6.6+1 #选择图片
 
-  jpush_flutter: 0.5.3
-
-  bdmap_location_flutter_plugin:
-    path: plugins/bdmap_location_flutter_plugin
+#  jpush_flutter: 0.5.3
+#
+#  bdmap_location_flutter_plugin:
+#    path: plugins/bdmap_location_flutter_plugin
 
 dev_dependencies:
   flutter_test:
