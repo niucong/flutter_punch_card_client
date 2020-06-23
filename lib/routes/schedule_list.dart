@@ -56,6 +56,7 @@ class _ScheduleListRouteState extends State<ScheduleListRoute> {
         'listData': json.encode(listData),
 //      'listData': 'listData',
       });
+
 //    Navigator.pop(context);
 //    await platform.invokeMethod('toScheduleActivity');
     }
