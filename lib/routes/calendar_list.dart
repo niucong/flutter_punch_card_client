@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,10 +36,15 @@ class _CalendarListRouteState extends State<CalendarListRoute> {
         await database.calendarDao.insertCalendar(listData[i]);
     }
 
-    Navigator.pop(context);
-    await platform.invokeMethod('toCalendarActivity');
+    if(Platform.isIOS){
+      //ios相关代码
+      setState(() {});
+    } else if(Platform.isAndroid){
+      //android相关代码
+      Navigator.pop(context);
+      await platform.invokeMethod('toCalendarActivity');
+    }
 
-//    setState(() {});
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:floor/floor.dart';
 import 'package:flutter/cupertino.dart';
@@ -45,14 +46,19 @@ class _ScheduleListRouteState extends State<ScheduleListRoute> {
     }
 
     print(json.encode(listData));
-    await platform.invokeMethod('toScheduleActivity', <String, dynamic>{
-      'listData': json.encode(listData),
+
+    if(Platform.isIOS){
+      //ios相关代码
+      setState(() {});
+    } else if(Platform.isAndroid){
+      //android相关代码
+      await platform.invokeMethod('toScheduleActivity', <String, dynamic>{
+        'listData': json.encode(listData),
 //      'listData': 'listData',
-    });
+      });
 //    Navigator.pop(context);
 //    await platform.invokeMethod('toScheduleActivity');
-
-//    setState(() {});
+    }
   }
 
   @override
